@@ -50,7 +50,6 @@ async def cmd_start(message: Message):
 async def echo(message: Message):
     await message.answer(f"Вы сказали: {message.text}")
 
-
 @router.message(F.photo)
 async def handle_photo(message: Message):
     photo: PhotoSize = message.photo[-1]
