@@ -48,11 +48,10 @@ class ImagePredictor:
             ToTensorV2(transpose_mask=True),
         ]
 
-    def predict_image(self, image: Union[Path, List[Path]]):
-        image_paths = [image] if isinstance(image, Path) else image
-        for img_path in image_paths:
+
+    def large_image_predict(self, image_path: Path):
             segmentation_data_builder = DataBuilder(
-                img_path,
+                image_path,
                 grid_type=GridType.FULL,
                 transforms=self.segmentation_transforms,
             )
@@ -70,7 +69,7 @@ class ImagePredictor:
             )
 
             invasion_data_builder = DataBuilder(
-                img_path,
+                image_path,
                 grid_type=GridType.ANNOTATION,
                 transforms=self.invasion_transforms,
                 wsa_path="images/annotation.geojson",
@@ -101,6 +100,23 @@ class ImagePredictor:
             poly = Feature.init().get_polygons_from_wsa(
                 "images/combine_prediction.geojson"
             )
+            return poly
+
+    def small_image_predict(self, image: np.ndarray):
+         image = self.segmentation_transforms(image=image)["image"]
+
+
+
+         
+
+    def predict_image(self, image: Union[Path, List[Path]]):
+        image_paths = [image] if isinstance(image, Path) else image
+        for img_path in image_paths:
+            image = cv2.cvtColor(cv2.imread(str(img_path)), cv2.COLOR_BGR2RGB)
+            # if image.shape[0] > 768 or image.shape[1] > 768:
+            poly = self.large_image_predict(img_path)
+            # else:
+            #     poly = self.small_image_predict(image)
             res = self.draw_contours(
                 poly, cv2.cvtColor(cv2.imread(str(img_path)), cv2.COLOR_BGR2RGB)
             )
