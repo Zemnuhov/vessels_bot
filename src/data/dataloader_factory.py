@@ -32,23 +32,6 @@ class DataBuilder:
         is_fill_without_tissue=False,
     ):
         self._grid = self._generate_grid(grid_type, image_path, wsa_path)
-
-        #########################
-        collection = ImageInferenceCollection.init(
-            grid=self._grid,
-            image_path=str(image_path),
-            is_fill_without_tissue=is_fill_without_tissue,
-            is_fill_without_mask=is_fill_without_mask,
-        )
-        for i, pos in zip(
-            collection.get_patches_iterator(), self._grid.patch_positions
-        ):
-            Feature.init().save_patch(
-                name=PatchName(row=pos.row, column=pos.column), path="images/", patch=i
-            )
-
-        ##########################
-
         collection = ImageInferenceCollection.init(
             grid=self._grid,
             image_path=str(image_path),
